@@ -18,7 +18,7 @@ const categoryRoute = require('./routes/CategoryRoute')
 app.use('/api/categories', categoryRoute)
 
 const itemRoute = require('./routes/ItemRoute')
-app.use('/api/foods', itemRoute)
+app.use('/api/items', itemRoute)
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))

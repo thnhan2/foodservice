@@ -6,7 +6,7 @@
   "repository": "https://github.com/thnhan2/foodservice.git",
   "author": "thnhan2",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js"
   },
   "license": "MIT",
   "dependencies": {

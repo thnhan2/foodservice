@@ -3,22 +3,17 @@ const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
     name: {
-        en: {
             type: String,
             required: true
-        },
-        vn: {
-            type: String,
-            required: false
-        }
     },
     categoryId: {
         type: Schema.Types.ObjectId,
-        ref: 'Category',
+        ref: 'categories',
         required: true
     },
     active: {
         type: Boolean,
+        default: true,
         required: true
     },
     price: {
@@ -26,24 +21,8 @@ const ItemSchema = new Schema({
         required: true
     },
     description: {
-        en: {
             type: String,
             required: true
-        },
-        vn: {
-            type: String,
-            required: false
-        },
-    },
-    unit: {
-        en: {
-            type: String,
-            required: true
-        },
-        vn: {
-            type: String,
-            required: false
-        },
     },
     imageUrl: {
         type: String,

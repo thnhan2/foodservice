@@ -1,4 +1,5 @@
 const CategorySchema = require('../models/Category');
+const ItemSchema = require('../models/Item');
 
 // create a new category
 const create = async (req, res) => {
@@ -38,12 +39,18 @@ const updateById = async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
     try {
-        const category = await CategorySchema.findByIdAndUpdate
-            (id, { name }, { new: true });
-        res.status(200).json(category);
-    }
-    catch (error) {
-        res.status(404).json({ message: error.message });
+        const category = await CategorySchema.findByIdAndUpdate(id, { name }, { new: true });
+        if (!category) {
+            return res.status(404).json({ message: 'Category does not exist' });
+        }
+        res.status(200).json(
+            {
+                message: 'Category updated successfully',
+                category
+            }
+            );
+    } catch (error) {
+        res.status(404).json({ message: "category id or name is not valid" });
     }
 }
 
@@ -58,10 +65,27 @@ const deleteById = async (req, res) => {
     }
 }
 
+// count distinct item in a category
+const countDistinctItem = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const category = await CategorySchema.findById(id);
+        if (!category) {
+            return res.status(404).json({ message: 'Category does not exist' });
+        }
+        const count = await ItemSchema.countDocuments({ categoryId: id });
+        res.status(200).json({ count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+
 module.exports = {
     create,
     getAll,
     getById,
     updateById,
-    deleteById
+    deleteById,
+    countDistinctItem
 }

@@ -1,5 +1,13 @@
+const fs = require("fs");
+const baseUrl = require("../middleware/helper/basePathHelper");
+const path = require("path");
+
 const Item = require("../models/Item");
-const domain = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://food-delivery-api-v1.herokuapp.com";
+const domain =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : "https://food-delivery-api-v1.herokuapp.com";
+
 
 // Get all items
 const getAllItems = async (req, res) => {
@@ -26,33 +34,26 @@ const getItemById = async (req, res) => {
 
 // Create a new item
 const createItem = async (req, res) => {
+
+  console.log(req.body);
   try {
     const newItem = new Item({
-      name: {
-        en: req.body.name.en || "",
-        vn: req.body.name.vn || "",
-      },
+      name: req.body.name,
       categoryId: req.body.categoryId,
-      active: req.body.active || true,
+      active: req.body.active ,
       price: req.body.price,
-      description: {
-        en: req.body.description.en || "",
-        vn: req.body.description.vn || "",
-      },
-      unit: {
-        en: req.body.unit.en || "",
-        vn: req.body.unit.vn || "",
-      },
-      imageUrl: ""
+      description: req.body.description,
+      imageUrl: "",
     });
 
     const savedItem = await newItem.save();
     res.status(201).json(savedItem);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
+// Edit/Upload item image
 const uploadItemImage = async (req, res) => {
   try {
     const item = await Item.findById(req.params.id);
@@ -61,23 +62,34 @@ const uploadItemImage = async (req, res) => {
     }
 
     if (req.file) {
-        const protocol = req.protocol;
-const host = req.get('host');
-const baseUrl = `${protocol}://${host}`;
+      const protocol = req.protocol;
+      const host = req.get("host");
+      const baseUrl = `${protocol}://${host}`;
 
-// Bây giờ bạn có thể sử dụng baseUrl khi cần thiết
-const imageUrl = `${baseUrl}\\${req.file.path}`;
-    //     const baseurl = req.baseUrl;
-    //   const urlpath   = baseurl +"\\" + req.file.path;
-    //   item.imageUrl = urlpath.replace(/\\+/g, '\\');
+      const imageUrl = `${baseUrl}\\${req.file.path}`;
+      if (item.imageUrl) {
+        deleteOldImage(item.imageUrl);
+      }
+
       item.imageUrl = imageUrl;
-
     }
-    console.log(item)
+    console.log(item);
     const savedItem = await item.save();
     res.json(savedItem);
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const deleteOldImage = async (imagePath) => {
+  try {
+    const imgBaseUrl = baseUrl(imagePath);
+    imagePath = imagePath.replace(imgBaseUrl, "");
+    console.log("image path" , imagePath);
+    const filePath = path.join(__dirname, "..", imagePath);
+    await fs.promises.unlink(filePath);
+  } catch (error) {
+    console.error("Error deleting image file:", error);
   }
 };
 
