@@ -1,0 +1,20 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+  nodejs:
+    image: thnhan2/foodservice
+    container_name: nodejs
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    depends_on:
+      - mongodb
+networks:
+  backend:
